@@ -1,4 +1,6 @@
-﻿namespace FHGuide.Shared.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace FHGuide.Shared.Models;
 
 public partial class Appointment
 {
@@ -8,5 +10,6 @@ public partial class Appointment
     public string End { get; set; } = null!;
     public int CourseId { get; set; }
 
+    [JsonIgnore]
     public virtual Course Course { get; set; } = null!;
 }

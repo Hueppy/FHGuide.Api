@@ -1,4 +1,6 @@
-﻿namespace FHGuide.Shared.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace FHGuide.Shared.Models;
 
 public partial class Account
 {
@@ -15,7 +17,10 @@ public partial class Account
     public string Password { get; set; } = null!;
     public DateTime CreateDate { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<Faq> Faqs { get; set; }
+    [JsonIgnore]
     public virtual ICollection<Rating> Ratings { get; set; }
+    [JsonIgnore]
     public virtual ICollection<Schedule> Schedules { get; set; }
 }

@@ -1,4 +1,6 @@
-﻿namespace FHGuide.Shared.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace FHGuide.Shared.Models;
 
 public partial class RatingValue
 {
@@ -8,5 +10,6 @@ public partial class RatingValue
     public string Text { get; set; } = null!;
     public int RatingId { get; set; }
 
+    [JsonIgnore]
     public virtual Rating Rating { get; set; } = null!;
 }

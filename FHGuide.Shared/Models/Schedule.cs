@@ -9,6 +9,6 @@ public partial class Schedule
     public DateTime CreateDate { get; set; }
     public int AccountId { get; set; }
 
-	[JsonIgnore]
+    [JsonIgnore]
     public virtual Account Account { get; set; } = null!;
 }

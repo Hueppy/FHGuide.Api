@@ -1,4 +1,6 @@
-﻿namespace FHGuide.Shared.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace FHGuide.Shared.Models;
 
 public partial class Module
 {
@@ -16,7 +18,10 @@ public partial class Module
     public string? Dependencies { get; set; }
     public string? Tags { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<Course> Courses { get; set; }
+    [JsonIgnore]
     public virtual ICollection<Faq> Faqs { get; set; }
+    [JsonIgnore]
     public virtual ICollection<Rating> Ratings { get; set; }
 }
