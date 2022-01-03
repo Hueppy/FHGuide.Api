@@ -40,6 +40,7 @@ GenFu.GenFu.Configure<Rating>()
 GenFu.GenFu.Configure<Course>()
 	.Fill(x => x.CourseId, 0)
 	.Fill(x => x.ModuleId).WithRandom(moduleIds)
+    .Fill(x => x.ZoomId, (int?)null)
 	.Fill(x => x.Room, () => random.Next(0, 9999).ToString());
 
 GenFu.GenFu.Configure<Schedule>()
@@ -48,7 +49,7 @@ GenFu.GenFu.Configure<Schedule>()
 
 Generate(context.Faqs, 50);
 Generate(context.Ratings, 50);
-Generate(context.Courses, 50);
+Generate(context.Courses, 10);
 Generate(context.Schedules, 50);
 
 context.SaveChanges();
