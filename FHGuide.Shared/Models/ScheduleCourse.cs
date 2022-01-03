@@ -8,7 +8,7 @@ public partial class ScheduleCourse
     public int CourseId { get; set; }
 
     [JsonIgnore]
-    public virtual Course Course { get; set; } = null!;
+    public virtual Course? Course { get; set; } = null!;
     [JsonIgnore]
-    public virtual Schedule Schedule { get; set; } = null!;
+    public virtual Schedule? Schedule { get; set; } = null!;
 }

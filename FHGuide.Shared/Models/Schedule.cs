@@ -10,5 +10,5 @@ public partial class Schedule
     public int AccountId { get; set; }
 
     [JsonIgnore]
-    public virtual Account Account { get; set; } = null!;
+    public virtual Account? Account { get; set; } = null!;
 }

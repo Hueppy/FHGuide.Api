@@ -11,5 +11,5 @@ public partial class Appointment
     public int CourseId { get; set; }
 
     [JsonIgnore]
-    public virtual Course Course { get; set; } = null!;
+    public virtual Course? Course { get; set; } = null!;
 }

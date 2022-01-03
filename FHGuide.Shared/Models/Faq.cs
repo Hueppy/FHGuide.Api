@@ -12,7 +12,7 @@ public partial class Faq
     public int ModuleId { get; set; }
 
     [JsonIgnore]
-    public virtual Account Account { get; set; } = null!;
+    public virtual Account? Account { get; set; } = null!;
     [JsonIgnore]
-    public virtual Module Module { get; set; } = null!;
+    public virtual Module? Module { get; set; } = null!;
 }

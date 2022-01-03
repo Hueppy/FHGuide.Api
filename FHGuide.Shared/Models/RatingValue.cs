@@ -11,5 +11,5 @@ public partial class RatingValue
     public int RatingId { get; set; }
 
     [JsonIgnore]
-    public virtual Rating Rating { get; set; } = null!;
+    public virtual Rating? Rating { get; set; } = null!;
 }
