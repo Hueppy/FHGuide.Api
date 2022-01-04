@@ -33,8 +33,12 @@ namespace FHGuide.Shared.Contexts
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseMySql("server=localhost;user=root;password=example;database=fhguide", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.6.5-mariadb"));
+                var server = Environment.GetEnvironmentVariable("DB_SERVER") ?? "localhost";
+                var user = Environment.GetEnvironmentVariable("DB_USER") ?? "root";
+                var password = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "example";
+                var database = Environment.GetEnvironmentVariable("DB_DATABASE") ?? "fhguide";
+            
+                optionsBuilder.UseMySql($"server={server};user={user};password={password};database={database}", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.6.5-mariadb"));
             }
         }
 
