@@ -16,12 +16,24 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+const string anyOriginPolicy = "anyOriginPolicy";
+
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IPasswordHasher<Account>, PasswordHasher>();
 builder.Services.AddScoped<IAuthenticator, Authenticator>();
 
 builder.Services.AddAuthentication("Basic")
 	.AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", (o) => {});
+
+builder.Services.AddCors(o =>
+{
+    o.AddPolicy(anyOriginPolicy, b =>
+    {
+        b.AllowAnyHeader()
+         .AllowAnyMethod()
+         .AllowAnyOrigin();
+    });
+});
 
 builder.Services.AddControllers((c) => 
 {
@@ -77,6 +89,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors(anyOriginPolicy);
 //app.UseAuthorization();
 app.UseAuthentication();
 
