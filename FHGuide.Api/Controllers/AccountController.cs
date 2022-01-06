@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using FHGuide.Shared.Models;
 using FHGuide.Shared.Contexts;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FHGuide.Api.Controllers;
 
@@ -8,11 +10,15 @@ namespace FHGuide.Api.Controllers;
 [Route("[controller]")]
 public class AccountController : ControllerBase
 {
-	private readonly FHGuideContext DbContext;
+	private readonly FHGuideContext dbContext;
+    private readonly IPasswordHasher<Account> hasher;
 
-    public AccountController(FHGuideContext dbContext)
+    public AccountController(
+        FHGuideContext dbContext,
+        IPasswordHasher<Account> hasher)
     {
-		this.DbContext = dbContext;
+		this.dbContext = dbContext;
+        this.hasher = hasher;
     }
 
 	/// <summary>
@@ -21,7 +27,11 @@ public class AccountController : ControllerBase
 	[HttpGet]
 	public IEnumerable<Account> Get()
 	{
-		return this.DbContext.Accounts;
+		foreach (var account in this.dbContext.Accounts)
+        {
+            account.Password = string.Empty;
+            yield return account;
+        }
 	}
 
 	/// <summary>
@@ -31,12 +41,14 @@ public class AccountController : ControllerBase
 	[HttpGet("{id}")]
 	public async Task<ActionResult<Account>> Get(int id)
 	{
-		var item = await this.DbContext.Accounts.FindAsync(id);
+		var item = await this.dbContext.Accounts.FindAsync(id);
 
 		if (item == null)
 		{
 			return NotFound();
 		}
+
+        item.Password = string.Empty;
 
 		return item;
 	}
@@ -48,24 +60,29 @@ public class AccountController : ControllerBase
 	[HttpGet("{id}/schedule")]
 	public async Task<ActionResult<IEnumerable<Schedule>>> GetSchedule(int id)
 	{
-		var item = await this.DbContext.Accounts.FindAsync(id);
+		var item = await this.dbContext.Accounts.FindAsync(id);
 
 		if (item == null)
 		{
 			return NotFound();
 		}
 
-		return Ok(this.DbContext.Schedules.Where((x) => x.AccountId == id));
+		return Ok(this.dbContext.Schedules.Where((x) => x.AccountId == id));
 	}
 
 	/// <summary>
 	/// Create new account
 	/// </summary>
+    [AllowAnonymous]
 	[HttpPost]
 	public async Task Post(Account account)
 	{
-		await this.DbContext.Accounts.AddAsync(account);
-		await this.DbContext.SaveChangesAsync();
+        account.AccountId = 0;
+        account.Password = this.hasher.HashPassword(account, account.Password);
+        account.CreateDate = DateTime.Now;
+        
+		await this.dbContext.Accounts.AddAsync(account);
+		await this.dbContext.SaveChangesAsync();
 	}
 
 	/// <summary>
@@ -75,8 +92,9 @@ public class AccountController : ControllerBase
 	public async Task Patch(int id, Account account)
 	{
 		account.AccountId = id;
-		this.DbContext.Accounts.Update(account);
-		await this.DbContext.SaveChangesAsync();
+        account.Password = this.hasher.HashPassword(account, account.Password);
+		this.dbContext.Accounts.Update(account);
+		await this.dbContext.SaveChangesAsync();
 	}
 
 	/// <summary>
@@ -85,15 +103,15 @@ public class AccountController : ControllerBase
 	[HttpDelete("{id}")]
 	public async Task<ActionResult> Delete(int id)
 	{
-		var item = await this.DbContext.Accounts.FindAsync(id);
+		var item = await this.dbContext.Accounts.FindAsync(id);
 
 		if (item == null)
 		{
 			return NotFound();
 		}
 
-		this.DbContext.Accounts.Remove(item);
-        await this.DbContext.SaveChangesAsync();
+		this.dbContext.Accounts.Remove(item);
+        await this.dbContext.SaveChangesAsync();
 		return Ok();
 	}
 }
