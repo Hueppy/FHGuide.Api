@@ -8,11 +8,11 @@ namespace FHGuide.Api.Controllers;
 [Route("[controller]")]
 public class AccountController : ControllerBase
 {
-	private readonly FHGuideContext DbContext;
+	private readonly FHGuideContext dbContext;
 
     public AccountController(FHGuideContext dbContext)
     {
-		this.DbContext = dbContext;
+		this.dbContext = dbContext;
     }
 
 	/// <summary>
@@ -21,7 +21,7 @@ public class AccountController : ControllerBase
 	[HttpGet]
 	public IEnumerable<Account> Get()
 	{
-		return this.DbContext.Accounts;
+		return this.dbContext.Accounts;
 	}
 
 	/// <summary>
@@ -31,7 +31,7 @@ public class AccountController : ControllerBase
 	[HttpGet("{id}")]
 	public async Task<ActionResult<Account>> Get(int id)
 	{
-		var item = await this.DbContext.Accounts.FindAsync(id);
+		var item = await this.dbContext.Accounts.FindAsync(id);
 
 		if (item == null)
 		{
@@ -48,14 +48,14 @@ public class AccountController : ControllerBase
 	[HttpGet("{id}/schedule")]
 	public async Task<ActionResult<IEnumerable<Schedule>>> GetSchedule(int id)
 	{
-		var item = await this.DbContext.Accounts.FindAsync(id);
+		var item = await this.dbContext.Accounts.FindAsync(id);
 
 		if (item == null)
 		{
 			return NotFound();
 		}
 
-		return Ok(this.DbContext.Schedules.Where((x) => x.AccountId == id));
+		return Ok(this.dbContext.Schedules.Where((x) => x.AccountId == id));
 	}
 
 	/// <summary>
@@ -64,8 +64,8 @@ public class AccountController : ControllerBase
 	[HttpPost]
 	public async Task Post(Account account)
 	{
-		await this.DbContext.Accounts.AddAsync(account);
-		await this.DbContext.SaveChangesAsync();
+		await this.dbContext.Accounts.AddAsync(account);
+		await this.dbContext.SaveChangesAsync();
 	}
 
 	/// <summary>
@@ -75,8 +75,8 @@ public class AccountController : ControllerBase
 	public async Task Patch(int id, Account account)
 	{
 		account.AccountId = id;
-		this.DbContext.Accounts.Update(account);
-		await this.DbContext.SaveChangesAsync();
+		this.dbContext.Accounts.Update(account);
+		await this.dbContext.SaveChangesAsync();
 	}
 
 	/// <summary>
@@ -85,15 +85,15 @@ public class AccountController : ControllerBase
 	[HttpDelete("{id}")]
 	public async Task<ActionResult> Delete(int id)
 	{
-		var item = await this.DbContext.Accounts.FindAsync(id);
+		var item = await this.dbContext.Accounts.FindAsync(id);
 
 		if (item == null)
 		{
 			return NotFound();
 		}
 
-		this.DbContext.Accounts.Remove(item);
-        await this.DbContext.SaveChangesAsync();
+		this.dbContext.Accounts.Remove(item);
+        await this.dbContext.SaveChangesAsync();
 		return Ok();
 	}
 }
