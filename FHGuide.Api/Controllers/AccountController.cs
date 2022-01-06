@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using FHGuide.Shared.Models;
 using FHGuide.Shared.Contexts;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FHGuide.Api.Controllers;
 
@@ -9,10 +11,14 @@ namespace FHGuide.Api.Controllers;
 public class AccountController : ControllerBase
 {
 	private readonly FHGuideContext dbContext;
+    private readonly IPasswordHasher<Account> hasher;
 
-    public AccountController(FHGuideContext dbContext)
+    public AccountController(
+        FHGuideContext dbContext,
+        IPasswordHasher<Account> hasher)
     {
 		this.dbContext = dbContext;
+        this.hasher = hasher;
     }
 
 	/// <summary>
@@ -21,7 +27,11 @@ public class AccountController : ControllerBase
 	[HttpGet]
 	public IEnumerable<Account> Get()
 	{
-		return this.dbContext.Accounts;
+		foreach (var account in this.dbContext.Accounts)
+        {
+            account.Password = string.Empty;
+            yield return account;
+        }
 	}
 
 	/// <summary>
@@ -37,6 +47,8 @@ public class AccountController : ControllerBase
 		{
 			return NotFound();
 		}
+
+        item.Password = string.Empty;
 
 		return item;
 	}
@@ -61,9 +73,14 @@ public class AccountController : ControllerBase
 	/// <summary>
 	/// Create new account
 	/// </summary>
+    [AllowAnonymous]
 	[HttpPost]
 	public async Task Post(Account account)
 	{
+        account.AccountId = 0;
+        account.Password = this.hasher.HashPassword(account, account.Password);
+        account.CreateDate = DateTime.Now;
+        
 		await this.dbContext.Accounts.AddAsync(account);
 		await this.dbContext.SaveChangesAsync();
 	}
@@ -75,6 +92,7 @@ public class AccountController : ControllerBase
 	public async Task Patch(int id, Account account)
 	{
 		account.AccountId = id;
+        account.Password = this.hasher.HashPassword(account, account.Password);
 		this.dbContext.Accounts.Update(account);
 		await this.dbContext.SaveChangesAsync();
 	}
