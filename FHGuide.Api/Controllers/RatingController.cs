@@ -21,34 +21,50 @@ public class RatingController : ControllerBase
 	[HttpGet]
 	public IEnumerable<Rating> Get()
 	{
-		// TODO: Implement this
-		return Enumerable.Empty<Rating>();
+		return this.DbContext.Ratings;
 	}
 
 	/// <summary>
 	/// Create new rating
 	/// </summary>
 	[HttpPost]
-	public void Post(Rating rating)
+	public async Task<int> Post(Rating rating)
 	{
-		// TODO: Implement this
+		rating.RatingId = 0;
+        var entry = await this.DbContext.Ratings.AddAsync(rating);
+        await this.DbContext.SaveChangesAsync();
+        return entry.Entity.RatingId;
 	}
 
 	/// <summary>
 	/// Update rating with specified id
 	/// </summary>
 	[HttpPatch("{id}")]
-	public void Patch(int id, Rating rating)
+	public async Task<ActionResult> Patch(int id, Rating rating)
 	{
-		// TODO: Implement this
+		if (!this.DbContext.Ratings.Any(x => x.RatingId == id)) {
+            return NotFound();
+        }
+        rating.RatingId = id;
+        var entry = this.DbContext.Ratings.Update(rating);
+        await this.DbContext.SaveChangesAsync();
+        return Ok();
 	}
 
 	/// <summary>
 	/// Delete rating with specified id
 	/// </summary>
 	[HttpDelete("{id}")]
-	public void Delete(int id)
+	public async Task<ActionResult> Delete(int id)
 	{
-		// TODO: Implement this
+		var rating = await this.DbContext.Ratings.FindAsync(id);
+        if (rating == null)
+        {
+            return NotFound();
+        }    
+        
+        this.DbContext.Ratings.Remove(rating);
+        await this.DbContext.SaveChangesAsync();
+        return Ok();
 	}
 }
