@@ -21,34 +21,50 @@ public class FaqController : ControllerBase
 	[HttpGet]
 	public IEnumerable<Faq> Get()
 	{
-		// TODO: Implement this
-		return Enumerable.Empty<Faq>();
+		return this.DbContext.Faqs;
 	}
 
 	/// <summary>
 	/// Add a question to Faq
 	/// </summary>
 	[HttpPost]
-	public void Post(Faq faq)
+	public async Task<int> Post(Faq faq)
 	{
-		// TODO: Implement this
+		faq.FaqId = 0;
+        var entry = await this.DbContext.Faqs.AddAsync(faq);
+        await this.DbContext.SaveChangesAsync();
+        return entry.Entity.FaqId;
 	}
 
 	/// <summary>
 	/// Update question with specified id
 	/// </summary>
 	[HttpPatch("{id}")]
-	public void Patch(int id, Faq faq)
+	public async Task<ActionResult> Patch(int id, Faq faq)
 	{
-		// TODO: Implement this
+		if (!this.DbContext.Faqs.Any(x => x.FaqId == id)) {
+            return NotFound();
+        }
+        faq.FaqId = id;
+        var entry = this.DbContext.Faqs.Update(faq);
+        await this.DbContext.SaveChangesAsync();
+        return Ok();
 	}
 
 	/// <summary>
 	/// Delete question with specified id
 	/// </summary>
 	[HttpDelete("{id}")]
-	public void Delete(int id)
+	public async Task<ActionResult> Delete(int id)
 	{
-		// TODO: Implement this
+		var faq = await this.DbContext.Faqs.FindAsync(id);
+        if (faq == null)
+        {
+            return NotFound();
+        }    
+        
+        this.DbContext.Faqs.Remove(faq);
+        await this.DbContext.SaveChangesAsync();
+        return Ok();
 	}
 }
