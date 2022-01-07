@@ -21,64 +21,77 @@ public class ModuleController : ControllerBase
 	[HttpGet]
 	public IEnumerable<Module> Get()
 	{
-		// TODO: Implement this
-		return Enumerable.Empty<Module>();
+        return this.DbContext.Modules;
 	}
 
 	/// <summary>
 	/// Get Faq of module
 	/// </summary>
 	[HttpGet("{id}/faq")]
-	public IEnumerable<Faq> GetFaq(string id)
+	public IEnumerable<Faq> GetFaq(int id)
 	{
-		// TODO: Implement this
-		return Enumerable.Empty<Faq>();		
+		return this.DbContext.Faqs.Where(x => x.ModuleId == id);
 	}
 
 	/// <summary>
 	/// Get ratings of module
 	/// </summary>
 	[HttpGet("{id}/rating")]
-	public IEnumerable<Rating> GetRating(string id)
+	public IEnumerable<Rating> GetRating(int id)
 	{
-		// TODO: Implement this
-		return Enumerable.Empty<Rating>();		
+		return this.DbContext.Ratings.Where(x => x.ModuleId == id);
 	}
 
 	/// <summary>
 	/// Get courses of module
 	/// </summary>
 	[HttpGet("{id}/course")]
-	public IEnumerable<Course> GetCourse(string id)
+	public IEnumerable<Course> GetCourse(int id)
 	{
-		// TODO: Implement this
-		return Enumerable.Empty<Course>();		
+		return this.DbContext.Courses.Where(x => x.ModuleId == id);
 	}
 
 	/// <summary>
 	/// Create a new module
 	/// </summary>
 	[HttpPost]
-	public void Post(Module module)
+	public async Task<int> Post(Module module)
 	{
-		// TODO: Implement this
+        module.ModuleId = 0;
+
+        var entry = await this.DbContext.Modules.AddAsync(module);
+        await this.DbContext.SaveChangesAsync();
+
+        return entry.Entity.ModuleId;
 	}
 
 	/// <summary>
 	/// Update module with specified id
 	/// </summary>
 	[HttpPatch("{id}")]
-	public void Patch(int id, Module module)
+	public async Task Patch(int id, Module module)
 	{
-		// TODO: Implement this
+		module.ModuleId = id;
+
+        this.DbContext.Update(module);
+        await this.DbContext.SaveChangesAsync();
 	}
 
 	/// <summary>
 	/// Delete module with specified id
 	/// </summary>
 	[HttpDelete("{id}")]
-	public void Delete(int id)
+	public async Task<ActionResult> Delete(int id)
 	{
-		// TODO: Implement this
+		var item = await this.DbContext.Modules.FindAsync(id);
+
+		if (item == null)
+		{
+			return NotFound();
+		}
+
+		this.DbContext.Modules.Remove(item);
+        await this.DbContext.SaveChangesAsync();
+		return Ok();
 	}
 }
