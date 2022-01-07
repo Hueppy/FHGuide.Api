@@ -21,34 +21,50 @@ public class RoadmapItemController : ControllerBase
 	[HttpGet]
 	public IEnumerable<RoadmapItem> Get()
 	{
-		// TODO: Implement this
-		return Enumerable.Empty<RoadmapItem>();
+        return this.DbContext.Roadmapitems;
 	}
 
 	/// <summary>
 	/// Create a new roadmap item
 	/// </summary>
 	[HttpPost]
-	public void Post(RoadmapItem roadmapItem)
+	public async Task<int> Post(RoadmapItem roadmapItem)
 	{
-		// TODO: Implement this
+        roadmapItem.RoadmapItemId = 0;
+        
+        var entry = await this.DbContext.Roadmapitems.AddAsync(roadmapItem);
+        await this.DbContext.SaveChangesAsync();
+
+        return entry.Entity.RoadmapItemId;
 	}
 
 	/// <summary>
 	/// Update roadmap item with specified id
 	/// </summary>
 	[HttpPatch("{id}")]
-	public void Patch(int id, RoadmapItem roadmapItem)
+	public async Task Patch(int id, RoadmapItem roadmapItem)
 	{
-		// TODO: Implement this
+        roadmapItem.RoadmapItemId = id;
+        this.DbContext.Roadmapitems.Update(roadmapItem);
+        await this.DbContext.SaveChangesAsync();
+        
 	}
 
 	/// <summary>
 	/// Delete roadmap item with specified id
 	/// </summary>
 	[HttpDelete("{id}")]
-	public void Delete(int id)
+	public async Task<ActionResult> Delete(int id)
 	{
-		// TODO: Implement this
+		var item = await this.DbContext.Roadmapitems.FindAsync(id);
+
+		if (item == null)
+		{
+			return NotFound();
+		}
+
+		this.DbContext.Roadmapitems.Remove(item);
+        await this.DbContext.SaveChangesAsync();
+		return Ok();
 	}
 }
