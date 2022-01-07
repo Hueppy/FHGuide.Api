@@ -1,4 +1,6 @@
-﻿namespace FHGuide.Shared.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace FHGuide.Shared.Models;
 
 public partial class Course
 {
@@ -16,9 +18,14 @@ public partial class Course
     public int? ZoomId { get; set; }
     public int ModuleId { get; set; }
 
-    public virtual Module Module { get; set; } = null!;
+    [JsonIgnore]
+    public virtual Module? Module { get; set; } = null!;
+    [JsonIgnore]
     public virtual Zoom? Zoom { get; set; }
+    [JsonIgnore]
     public virtual ICollection<Appointment> Appointments { get; set; }
+    [JsonIgnore]
     public virtual ICollection<RoadmapItem> RoadmapItems { get; set; }
+    [JsonIgnore]
     public virtual ICollection<Zoom> Zooms { get; set; }
 }

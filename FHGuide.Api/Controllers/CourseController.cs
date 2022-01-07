@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FHGuide.Shared.Models;
 using FHGuide.Shared.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace FHGuide.Api.Controllers;
 
@@ -21,73 +22,87 @@ public class CourseController : ControllerBase
 	[HttpGet]
 	public IEnumerable<Course> Get()
 	{
-		// TODO: Implement this
-		return Enumerable.Empty<Course>();
+        return this.DbContext.Courses;
 	}
 
 	/// <summary>
 	/// Get all appointments of course
 	/// </summary>
 	[HttpGet("{id}/appointment")]
-	public IEnumerable<Appointment> GetAppointment(string id)
-	{
-		// TODO: Implement this
-		return Enumerable.Empty<Appointment>();
+	public IEnumerable<Appointment> GetAppointment(int id)
+	{        
+        return this.DbContext.Appointments.Where(x => x.CourseId == id);
 	}
 
 	/// <summary>
 	/// Get all roadmap items of course
 	/// </summary>
 	[HttpGet("{id}/roadmap")]
-	public IEnumerable<RoadmapItem> GetRoadmap(string id)
+	public IEnumerable<RoadmapItem> GetRoadmap(int id)
 	{
-		// TODO: Implement this
-		return Enumerable.Empty<RoadmapItem>();
+        return this.DbContext.Roadmapitems.Where(x => x.CourseId == id);
 	}
 
 	/// <summary>
 	/// Get all schedules of course
 	/// </summary>
 	[HttpGet("{id}/schedule")]
-	public IEnumerable<Schedule> GetSchedule(string id)
+	public IEnumerable<Schedule?> GetSchedule(int id)
 	{
-		// TODO: Implement this
-		return Enumerable.Empty<Schedule>();
+        return this.DbContext.ScheduleCourses
+            .Include(x => x.Schedule)
+            .Where(x => x.CourseId == id)
+            .Select(x => x.Schedule);
 	}
 
 	/// <summary>
 	/// Get zoom link of course
 	/// </summary>
 	[HttpGet("{id}/zoom")]
-	public Zoom? GetZoom(string id)
+	public async Task<Zoom?> GetZoom(int id)
 	{
-		return null;
+		return await this.DbContext.Zooms.Where(x => x.CourseId == id).FirstOrDefaultAsync();
 	}
 
 	/// <summary>
 	/// Create a new course
 	/// </summary>	
 	[HttpPost]
-	public void Post(Course course)
-	{
-		// TODO: Implement this
+	public async Task<int> Post(Course course)
+    {
+        course.CourseId = 0;
+        var entry = await this.DbContext.Courses.AddAsync(course);
+        await this.DbContext.SaveChangesAsync();
+
+        return entry.Entity.CourseId;
 	}
 
 	/// <summary>
 	/// Update course with specified id
 	/// </summary>
 	[HttpPatch("{id}")]
-	public void Patch(int id, Course course)
+	public async Task Patch(int id, Course course)
 	{
-		// TODO: Implement this
+        course.CourseId = id;
+        this.DbContext.Courses.Update(course);
+        await this.DbContext.SaveChangesAsync();
 	}
 
 	/// <summary>
 	/// Delete course with specified id
 	/// </summary>
 	[HttpDelete("{id}")]
-	public void Delete(int id)
-	{
-		// TODO: Implement this
+	public async Task<ActionResult> Delete(int id)
+    {
+        var course = await this.DbContext.Courses.FindAsync(id);
+        
+		if (course == null)
+		{
+			return NotFound();
+		}
+
+		this.DbContext.Courses.Remove(course);
+        await this.DbContext.SaveChangesAsync();
+		return Ok();
 	}
 }
