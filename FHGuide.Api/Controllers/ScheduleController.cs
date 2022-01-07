@@ -21,34 +21,50 @@ public class ScheduleController : ControllerBase
 	[HttpGet]
 	public IEnumerable<Schedule> Get()
 	{
-		// TODO: Implement this
-		return Enumerable.Empty<Schedule>();
+		return this.DbContext.Schedules;
 	}
 
 	/// <summary>
 	/// Create a new schedule
 	/// </summary>
 	[HttpPost]
-	public void Post(Schedule schedule)
+	public async Task<int> Post(Schedule schedule)
 	{
-		// TODO: Implement this
+		schedule.ScheduleId = 0;
+        var entry = await this.DbContext.Schedules.AddAsync(schedule);
+        await this.DbContext.SaveChangesAsync();
+        return entry.Entity.ScheduleId;
 	}
 
 	/// <summary>
 	/// Update schedule with specified id
 	/// </summary>
 	[HttpPatch("{id}")]
-	public void Patch(int id, Schedule schedule)
+	public async Task<ActionResult> Patch(int id, Schedule schedule)
 	{
-		// TODO: Implement this
+		if (!this.DbContext.Schedules.Any(x => x.ScheduleId == id)) {
+            return NotFound();
+        }
+        schedule.ScheduleId = id;
+        var entry = this.DbContext.Schedules.Update(schedule);
+        await this.DbContext.SaveChangesAsync();
+        return Ok();
 	}
 
 	/// <summary>
 	/// Delete schedule with specified id
 	/// </summary>
 	[HttpDelete("{id}")]
-	public void Delete(int id)
+	public async Task<ActionResult> Delete(int id)
 	{
-		// TODO: Implement this
+		var schedule = await this.DbContext.Schedules.FindAsync(id);
+        if (schedule == null)
+        {
+            return NotFound();
+        }    
+        
+        this.DbContext.Schedules.Remove(schedule);
+        await this.DbContext.SaveChangesAsync();
+        return Ok();
 	}
 }
